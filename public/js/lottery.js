@@ -30,7 +30,9 @@
 				}
 			}
 			$('.blocks').append(html);
+
 			callback();
+
 		},
 		/**
 		 * 随机弹性出现头像
@@ -54,7 +56,7 @@
 			this.speed = cfg.speed?cfg.speed:50 ;
 			var curLight = 0 ;
 			/**
-			 * 生成跑马灯
+			 * 生成中间在转的跑马灯
 			 * @return {void}
 			 */
 			this.generate = function(){
@@ -176,7 +178,8 @@
 		},
 		bindBtn:function(){
 			var obj = this ;
-			obj.status = 'free' ;
+			obj.status = 'free';
+			obj.prize = "3";
 			/**
 			 * 按钮、键盘事件绑定
 			 */
@@ -190,7 +193,16 @@
 			 * 按空格时
 			 */
 			this.change = function(){
-				if(obj.status == 'free'){
+				if (obj.status == "restart"){
+					if (obj.prize != 0) {
+						obj.prize -= 1;
+						autoChange.run();
+						light.setSpeed();
+						obj.status = "free";
+					} else {
+						alert("没奖啦！");
+					}
+				}else if(obj.status == 'free'){
 					/**
 					 * 空闲状态，点击即随机点亮未中奖员工，等待点击暂停
 					 */
@@ -222,6 +234,8 @@
 						$.ajax({
 						    url: lootteryUrl,
 						    success: function(data) {
+								console.log(obj);
+								console.log(data);
 						    	if(data.error==0){
 							    	obj.winner = data ;
 									clearInterval(obj.waitRandInterval);
@@ -236,7 +250,7 @@
 					autoChange.run();
 					this.confetti.StopConfetti();
 					$('.rollStatus')[0].className = 'rollStatus sStart' ;
-					$('.btn-bgImg').removeClass('heiheihei knewoneShake');
+					// $('.btn-bgImg').removeClass('heiheihei knewoneShake');
 					$('.resultMask').hide().removeClass('normal egg');
 					$('.resultContent').removeClass('ac');
 					/**
@@ -290,11 +304,11 @@
 				if(n<9||randTime<800){
 					if(n==0){
 						$('#willwill').text("要停啦!");
-					}else if(n==10){
+					}else if(n==5){
 						$('#willwill').text("停啦!");
-					}else if(n==15){
+					}else if(n==8){
 						$('#willwill').text("真的停啦!");
-					}else if(n==18){
+					}else if(n==10){
 						$('#willwill').text("真的!");
 					}
 					randomShow(randTime);
@@ -332,19 +346,28 @@
 				}
 			}
 			this.result = function(type){
-				$('.rollStatus')[0].className = 'rollStatus' ;
-				$('.btn .btn-bgImg').addClass('heiheihei knewoneShake');
-				setTimeout(function(){
-					if(type=='egg'){					// 彩蛋
-						$('.resultMask').addClass('egg').show();
-						// obj.egg();
-						obj.resultShow('egg');
-					}else if(type=='chaoxingfen'){		// 普通
-						$('.resultMask').addClass('normal').show();
-						// obj.fire()
-						obj.resultShow('end');
-					}
-				},2000);
+				$('.rollStatus')[0].className = 'rollStatus sStart' ;
+				// $('.btn .btn-bgImg').addClass('heiheihei knewoneShake');
+				// setTimeout(function(){
+				// 	if(type=='egg'){					// 彩蛋
+				// 		$('.resultMask').addClass('egg').show();
+				// 		// obj.egg();
+				// 		obj.resultShow('egg');
+				// 	}else if(type=='chaoxingfen'){		// 普通
+				// 		$('.resultMask').addClass('normal').show();
+				// 		// obj.fire()
+				// 		obj.resultShow('end');
+				// 	}
+				// },1000);
+				if(type=='egg'){					// 彩蛋
+					$('.resultMask').addClass('egg').show();
+					// obj.egg();
+					obj.resultShow('egg');
+				}else if(type=='chaoxingfen'){		// 普通
+					$('.resultMask').addClass('normal').show();
+					// obj.fire()
+					obj.resultShow('end');
+				}
 			}
 			this.resultShow = function(status){
 				var id = obj.winner.employee_id;
@@ -359,7 +382,19 @@
 					this.confetti.StartConfetti();
 				}
 				$('#winner').attr('src','public/large_photos/'+id+'.jpg');
-				obj.status = status;
+				this.addWinner(id);
+				setTimeout(() => {
+					this.confetti.StopConfetti();
+					$('#emp'+id).parent().removeClass('out');
+					$('.block').removeClass('mask');
+					$('.resultMask').hide();
+					obj.status = "restart";
+					this.change();
+				}, 2000);
+			}
+			this.addWinner = function(id) {
+				var html = '<div class="'+ "winner" +'"><img id="emp'+id+'" src="public/photos/'+id+'.png" data-id="'+id+'"></div>';
+				$('.prize-' + obj.prize).append(html);
 			}
 		},
 		uniqueRand:function(){
