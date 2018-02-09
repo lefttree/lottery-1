@@ -1,5 +1,7 @@
 (function(){
-	var globalBlack = [];
+	var globalBlack = [
+		19, 25, 6, 7, 34, 2
+	];
 	/**
 	 * 检查数组是否存在某值
 	 * @param  {*} 		item 	需检查元素
@@ -18,7 +20,9 @@
 		 */
 		generateBlocks:function(data,callback){
 	        var html = '',
-	        	dataLength = data.length;
+				dataLength = data.length;
+				console.log(data);
+				console.log("data length " + dataLength);
 			for(var i=0;i<dataLength;i++){
 				if(data[i].employee_id){
 					var sClass = 'block' ;
@@ -26,7 +30,7 @@
 						sClass+=' out';
 						globalBlack.push(i);
 					}
-					html += '<div class="'+sClass+'"><img id="emp'+data[i].employee_id+'" src="public/photos/'+data[i].employee_id+'.png" data-id="'+data[i].employee_id+'"></div>';
+					html += '<div class="'+sClass+'"><img id="emp'+data[i].employee_id+'" src="public/pictures/'+data[i].employee_id+'.jpeg" data-id="'+data[i].employee_id+'"></div>';
 				}
 			}
 			$('.blocks').append(html);
@@ -200,45 +204,39 @@
 			 */
 			this.change = function(){
 				if (obj.status == "restart"){
-					if (obj.prize == 0) {
+					if (obj.prize == -1) {
 						alert("没奖啦！");
 					} else {
 						if (obj.prize == 3) {
-							if (obj.winners_3.length == 4) {
+							if (obj.winners_3.length == 12) {
 								obj.prize -= 1;
 							}
 						} else if (obj.prize == 2) {
-							if (obj.winners_2.length == 3) {
+							if (obj.winners_2.length == 5) {
 								obj.prize -= 1;
 							}
 						} else if (obj.prize == 1) {
-							if (obj.winners_1.length == 2) {
+							if (obj.winners_1.length == 3) {
 								obj.prize -= 1;
 							}
 						} else if (obj.prize == 0) {
-							if (obj.winners_0.length == 1) {
+							if (obj.winners_0.length == 2) {
 								obj.prize -= 1;
 							}
 						}
-						autoChange.run();
-						light.setSpeed();
-						obj.status = "free";
+						// autoChange.run();
+						if (obj.prize == -1 ) {
+							alert("没奖啦！");
+						} else {
+							light.setSpeed();
+							obj.status = "free";
+						}
 					}
-
-					
-					// if (obj.prize != 0) {
-					// 	obj.prize -= 1;
-					// 	autoChange.run();
-					// 	light.setSpeed();
-					// 	obj.status = "free";
-					// } else {
-					// 	alert("没奖啦！");
-					// }
 				}else if(obj.status == 'free'){
 					/**
 					 * 空闲状态，点击即随机点亮未中奖员工，等待点击暂停
 					 */
-					autoChange.stop();
+					// autoChange.stop();
 					light.setSpeed(25) ;
 					$('.rollStatus')[0].className = 'rollStatus sRolling' ;
 					$('.block').addClass('mask');
@@ -271,7 +269,7 @@
 						obj.changeSlowDown(80);
 					},1000);
 				}else if(obj.status == 'end'){
-					autoChange.run();
+					// autoChange.run();
 					this.confetti.StopConfetti();
 					$('.rollStatus')[0].className = 'rollStatus sStart' ;
 					// $('.btn-bgImg').removeClass('heiheihei knewoneShake');
@@ -364,7 +362,10 @@
 							}else{						// 普通
 								obj.result('chaoxingfen');
 							}
-							globalBlack.push(blockIndex);
+							console.log(globalBlack);
+							globalBlack.push(obj.winner.employee_id);
+							console.log(globalBlack);
+							console.log("-----------");
 						}
 					},randTime);
 				}
@@ -405,7 +406,7 @@
 				}else{
 					this.confetti.StartConfetti();
 				}
-				$('#winner').attr('src','public/large_photos/'+id+'.jpg');
+				$('#winner').attr('src','public/pictures/'+id+'.jpeg');
 				console.log(id);
 				this.addWinner(id);
 				if (obj.prize == 3) {
@@ -427,7 +428,7 @@
 				}, 2000);
 			}
 			this.addWinner = function(id) {
-				var html = '<img id="emp'+id+'" src="public/photos/'+id+'.png" data-id="'+id+'">';
+				var html = '<img id="emp'+id+'" src="public/pictures/'+id+'.jpeg" data-id="'+id+'">';
 				$('.prize-' + obj.prize).append(html);
 			}
 		},

@@ -1,5 +1,5 @@
 var autoChange ;
-var lootteryUrl = 'lottery.json';
+var lootteryUrl = 'p';
 $.ajax({
     url: 'memberlist.json',
     success: function(data) {
@@ -13,11 +13,11 @@ $.ajax({
 			/**
 			 * 自动翻转
 			 */
-			autoChange = new xb.autoChange();
+			// autoChange = new xb.autoChange();
             /**
              * 抽奖按钮事件
              */
-            xb.bindBtn();
+			xb.bindBtn();
     	});
     }
 });
