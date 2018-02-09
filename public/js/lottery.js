@@ -180,6 +180,12 @@
 			var obj = this ;
 			obj.status = 'free';
 			obj.prize = "3";
+			obj.winners_0 = [];
+			obj.winners_1 = [];
+			obj.winners_2 = [];
+			obj.winners_3 = [];
+			obj.mustwin = [];
+			obj.blacklist = [];
 			/**
 			 * 按钮、键盘事件绑定
 			 */
@@ -194,14 +200,40 @@
 			 */
 			this.change = function(){
 				if (obj.status == "restart"){
-					if (obj.prize != 0) {
-						obj.prize -= 1;
+					if (obj.prize == 0) {
+						alert("没奖啦！");
+					} else {
+						if (obj.prize == 3) {
+							if (obj.winners_3.length == 4) {
+								obj.prize -= 1;
+							}
+						} else if (obj.prize == 2) {
+							if (obj.winners_2.length == 3) {
+								obj.prize -= 1;
+							}
+						} else if (obj.prize == 1) {
+							if (obj.winners_1.length == 2) {
+								obj.prize -= 1;
+							}
+						} else if (obj.prize == 0) {
+							if (obj.winners_0.length == 1) {
+								obj.prize -= 1;
+							}
+						}
 						autoChange.run();
 						light.setSpeed();
 						obj.status = "free";
-					} else {
-						alert("没奖啦！");
 					}
+
+					
+					// if (obj.prize != 0) {
+					// 	obj.prize -= 1;
+					// 	autoChange.run();
+					// 	light.setSpeed();
+					// 	obj.status = "free";
+					// } else {
+					// 	alert("没奖啦！");
+					// }
 				}else if(obj.status == 'free'){
 					/**
 					 * 空闲状态，点击即随机点亮未中奖员工，等待点击暂停
@@ -231,20 +263,12 @@
 						/**
 						 * 请求中奖结果并减速
 						 */
-						$.ajax({
-						    url: lootteryUrl,
-						    success: function(data) {
-								console.log(obj);
-								console.log(data);
-						    	if(data.error==0){
-							    	obj.winner = data ;
-									clearInterval(obj.waitRandInterval);
-									obj.changeSlowDown(80);
-						    	}else{
-						    		alert(data.msg);
-						    	}
-						    }
-						});
+						var rand = xb.uniqueRand();
+						obj.winner = {
+							employee_id: rand
+						};
+						clearInterval(obj.waitRandInterval);
+						obj.changeSlowDown(80);
 					},1000);
 				}else if(obj.status == 'end'){
 					autoChange.run();
@@ -382,7 +406,17 @@
 					this.confetti.StartConfetti();
 				}
 				$('#winner').attr('src','public/large_photos/'+id+'.jpg');
+				console.log(id);
 				this.addWinner(id);
+				if (obj.prize == 3) {
+					obj.winners_3.push(id);
+				} else if(obj.prize == 2) {
+					obj.winners_2.push(id);
+				} else if (obj.prize == 1) {
+					obj.winners_1.push(id);
+				} else if (obj.prize == 0) {
+					obj.winners_0.push(id);
+				}
 				setTimeout(() => {
 					this.confetti.StopConfetti();
 					$('#emp'+id).parent().removeClass('out');
@@ -393,7 +427,7 @@
 				}, 2000);
 			}
 			this.addWinner = function(id) {
-				var html = '<div class="'+ "winner" +'"><img id="emp'+id+'" src="public/photos/'+id+'.png" data-id="'+id+'"></div>';
+				var html = '<img id="emp'+id+'" src="public/photos/'+id+'.png" data-id="'+id+'">';
 				$('.prize-' + obj.prize).append(html);
 			}
 		},
@@ -401,11 +435,11 @@
 			var rand,allCount=$('.block').length ;
 			for(;;){
 				rand = parseInt(Math.random()*allCount) ;
-				if(!globalBlack.contains(rand)){
+				if(rand != 0 && !globalBlack.contains(rand)){
 					break;
 				}
 			}
 			return rand ;
-		}
+		},
 	}
 })()

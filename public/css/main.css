@@ -124,8 +124,8 @@ body{font-family:'PingFang SC';background:rgba(0,0,0,0.5);}
 }
 
 .winner img{
-    display:block;
     border-radius: 8px;
+    height: 96px;
     width: 96px;
     align-content: left;
     margin: 5px;
