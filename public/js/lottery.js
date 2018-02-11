@@ -323,15 +323,9 @@
 			this.changeSlowDown = function(time,n,end){
 				n?'':n=0;
 				var randTime = time+parseInt(Math.random()*10*n);
-				if(n<9||randTime<800){
-					if(n==0){
+				if(n<3||randTime<250){
+					if(n < 5){
 						$('#willwill').text("要停啦!");
-					}else if(n==5){
-						$('#willwill').text("停啦!");
-					}else if(n==8){
-						$('#willwill').text("真的停啦!");
-					}else if(n==10){
-						$('#willwill').text("真的!");
 					}
 					randomShow(randTime);
 				}else{
@@ -444,3 +438,31 @@
 		},
 	}
 })()
+
+var autoChange ;
+var lootteryUrl = 'p';
+$.ajax({
+    url: 'memberlist.json',
+    success: function(data) {
+    	xb.generateBlocks(data,function(){
+    		/**
+    		 * 弹性出现头像
+    		 */
+    		$('.content .block').each(function(index,el){
+				xb.bounceIn($(el))
+			});
+			/**
+			 * 自动翻转
+			 */
+			// autoChange = new xb.autoChange();
+            /**
+             * 抽奖按钮事件
+             */
+			xb.bindBtn();
+    	});
+    }
+});
+/**
+ * 跑马灯生成
+ */
+var light = new xb.lights({wrap:'.lightsWrap'});
